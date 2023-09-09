@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+model user {
+  id           Int            @default(autoincrement())
+  user_id      String         @id @default(uuid())
+  name         String         @unique
+  is_active    Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+  message      message[]
+  participants participants[]
+  threads      threads[]
+}
+
+model threads {
+  id           Int            @default(autoincrement())
+  thread_id    String         @id @default(uuid())
+  name         String         @unique
+  is_group     Boolean
+  createdBy    String
+  user         user?          @relation(fields: [createdBy], references: [user_id])
+  is_active    Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+  message      message[]
+  participants participants[]
+}
+
+model message {
+  id         Int       @default(autoincrement())
+  message_id String    @id @default(uuid())
+  body       String
+  user_id    String
+  user       user?     @relation(fields: [user_id], references: [user_id])
+  thread_id  String
+  thread     threads?  @relation(fields: [thread_id], references: [thread_id])
+  is_active  Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+}
+
+model participants {
+  id             Int       @default(autoincrement())
+  participant_id String    @id @default(uuid())
+  user_id        String
+  user           user?     @relation(fields: [user_id], references: [user_id])
+  thread_id      String
+  thread         threads?  @relation(fields: [thread_id], references: [thread_id])
+  is_active      Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+}
